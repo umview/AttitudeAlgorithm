@@ -45,31 +45,24 @@ bCn = nCb';
 for k = 2:N
     rawGyro(:,k) = rawGyro(:,k) - gyroOffset;
     rawGyro(:,k) = rawGyro(:,k) * 1000 / 32768 * pi / 180;
+    CEular(:,k) = AHRSupdateC(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
     Eular(:,k) = AHRSupdate(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
     Eular(:,k) = Eular(:,k) * 180 / pi;
-end
-figure(1);
-plot(Eular([1,2],:)');
-Q = [0;
-     0.05;
-     0.01;
-     0.01];
-for k = 2:N
-    rawGyro(:,k) = rawGyro(:,k) - gyroOffset;
-    rawGyro(:,k) = rawGyro(:,k) * 1000 / 32768 * pi / 180;
-    CEular(:,k) = AHRSupdateC(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
     CEular(:,k) = CEular(:,k) * 180 / pi;
 
 end
+figure(1);
+plot(Eular([1,2],:)');
 figure(2)
-plot(CEular([1,2],:)');
+plot(Eular(
+%plot(raw');
 raw = raw';
 for k=1:N
-    angle(2,k) = acos(raw(1,k) / sqrt(raw(1,k)^2 + raw(3,k)^2));
-    angle(1,k) = acos(raw(2,k) / sqrt(raw(2,k)^2 + raw(3,k)^2));
+    angle(1,k) = acos(raw(1,k) / sqrt(raw(1,k)^2 + raw(3,k)^2));
+    angle(2,k) = acos(raw(2,k) / sqrt(raw(2,k)^2 + raw(3,k)^2));
     angle(3,k) = acos(raw(1,k) / sqrt(raw(1,k)^2 + raw(2,k)^2));
     angle(:,k) = angle(:,k) * 180 / pi;
 end
-figure(3);
+figure(2);
 plot(angle');
 

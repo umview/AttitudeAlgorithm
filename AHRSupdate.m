@@ -20,7 +20,7 @@ function Eular = AHRSupdate(Accel,Gyro,Mag)
     CrossM = cross(Mag,M);
     CrossA = cross(Accel,A);
     Err =  CrossA + CrossM;
-    ErrInt = ErrInt + Err * Ki;
+    ErrInt = ErrInt + Err * Ki * T;
     Gyro = Gyro + Kp * Err + ErrInt;
     delta = Gyro * T;
     deltaX = [0,    -delta(1), -delta(2), -delta(3);
@@ -36,19 +36,19 @@ function Eular = AHRSupdate(Accel,Gyro,Mag)
     Eular = [asin(bCn(2,3));
              atan(-bCn(1,3)/bCn(3,3));
              atan(bCn(2,1)/bCn(2,2))];
-%     if (bCn(2,2) == 0 && bCn(2,1) > 0)
-%             Eular(3) = pi / 2;
-%         else if (bCn(2,2) ==0 && bCn(2,1)<0)
-%                 Eular(3) = 3 * pi / 2;
-%             else if (bCn(2,2) > 0 && bCn(2,1)>=0)
-%                     Eular(3) = Eular(3);
-%                 else if bCn(2,2) < 0
-%                         Eular(3) = Eular(3) + pi;
-%                     else
-%                             Eular(3) = Eular(3) + 2 * pi;
-%                     end
-%                 end
-%             end
-%     end
+    if (bCn(2,2) == 0 && bCn(2,1) > 0)
+            Eular(3) = pi / 2;
+        else if (bCn(2,2) ==0 && bCn(2,1)<0)
+                Eular(3) = 3 * pi / 2;
+            else if (bCn(2,2) > 0 && bCn(2,1)>=0)
+                    Eular(3) = Eular(3);
+                else if bCn(2,2) < 0
+                        Eular(3) = Eular(3) + pi;
+                    else
+                            Eular(3) = Eular(3) + 2 * pi;
+                    end
+                end
+            end
+    end
 end
 
