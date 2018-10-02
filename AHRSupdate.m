@@ -7,7 +7,6 @@ function Eular = AHRSupdate(Accel,Gyro,Mag)
     global Kp;
     global Ki;
     global ErrInt;
-%    global Eular;
     Accel = Accel / sqrt(sum(Accel.^2));
     Mag = Mag / sqrt(sum(Mag.^2));
     M = nCb * Mag;
