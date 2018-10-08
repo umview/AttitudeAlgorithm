@@ -35,72 +35,73 @@ rawGyro = raw(:,[4, 5, 6])';
 rawMag = raw(:,[7, 8, 9])';
 rawGyro(:,1) = rawGyro(:,1) - gyroOffset;
 rawGyro(:,1) = rawGyro(:,1) * 1000 / 32768 * pi / 180;
-if rawMag(1,1) < 0 && rawMag(2,1) < 0
-    if abs(rawMag(1,1) / rawMag(2,1)) >= 1
-        Q0(1) = 0.195;
-        Q0(2) = -0.015;
-        Q0(3) = 0.0043;
-        Q0(4) = 0.979;
-    else
-        Q0(1) = 0.555;
-        Q0(2) = -0.015;
-        Q0(3) = 0.006;
-        Q0(4) = 0.829;
-    end
-end
-if rawMag(1,1) < 0  && rawMag(2,1) > 0
-    if abs(rawMag(1,1) / rawMag(2,1)) >= 1
-        Q0(1) = -0.193;
-        Q0(2) = -0.009;
-        Q0(3) = -0.006;
-        Q0(4) = 0.979;
-    else
-        Q0(1) = -0.552;
-        Q0(2) = -0.0048;
-        Q0(3) = -0.0115;
-        Q0(4) = 0.8313;
-    end
-end
-if rawMag(1,1) > 0 && rawMag(2,1) > 0
-    if abs(rawMag(1,1) / rawMag(2,1)) >= 1
-        Q0(1) = -0.9785;
-        Q0(2) = 0.008;
-        Q0(3) = -0.02;
-        Q0(4) = 0.195;
-    else
-        Q0(1) = -0.9828;
-        Q0(2) = 0.002;
-        Q0(3) = -0.0167;
-        Q0(4) = 0.5557;
-    end
-end
-if rawMag(1,1) > 0 && rawMag(2,1) < 0
-    if abs(rawMag(1,1) / rawMag(2,1)) >= 1
-        Q0(1) = -0.979;
-        Q0(2) = 0.0116;
-        Q0(3) = -0.0167;
-        Q0(4) = -0.195;
-    else
-        Q0(1) = -0.83;
-        Q0(2) = 0.014;
-        Q0(3) = -0.012;
-        Q0(4) = -0.556;
-    end
-end
+Q0 = QuaternionInit(rawAccel(:,1), rawMag(:,1));
+% if rawMag(1,1) < 0 && rawMag(2,1) < 0
+%     if abs(rawMag(1,1) / rawMag(2,1)) >= 1
+%         Q0(1) = 0.195;
+%         Q0(2) = -0.015;
+%         Q0(3) = 0.0043;
+%         Q0(4) = 0.979;
+%     else
+%         Q0(1) = 0.555;
+%         Q0(2) = -0.015;
+%         Q0(3) = 0.006;
+%         Q0(4) = 0.829;
+%     end
+% end
+% if rawMag(1,1) < 0  && rawMag(2,1) > 0
+%     if abs(rawMag(1,1) / rawMag(2,1)) >= 1
+%         Q0(1) = -0.193;
+%         Q0(2) = -0.009;
+%         Q0(3) = -0.006;
+%         Q0(4) = 0.979;
+%     else
+%         Q0(1) = -0.552;
+%         Q0(2) = -0.0048;
+%         Q0(3) = -0.0115;
+%         Q0(4) = 0.8313;
+%     end
+% end
+% if rawMag(1,1) > 0 && rawMag(2,1) > 0
+%     if abs(rawMag(1,1) / rawMag(2,1)) >= 1
+%         Q0(1) = -0.9785;
+%         Q0(2) = 0.008;
+%         Q0(3) = -0.02;
+%         Q0(4) = 0.195;
+%     else
+%         Q0(1) = -0.9828;
+%         Q0(2) = 0.002;
+%         Q0(3) = -0.0167;
+%         Q0(4) = 0.5557;
+%     end
+% end
+% if rawMag(1,1) > 0 && rawMag(2,1) < 0
+%     if abs(rawMag(1,1) / rawMag(2,1)) >= 1
+%         Q0(1) = -0.979;
+%         Q0(2) = 0.0116;
+%         Q0(3) = -0.0167;
+%         Q0(4) = -0.195;
+%     else
+%         Q0(1) = -0.83;
+%         Q0(2) = 0.014;
+%         Q0(3) = -0.012;
+%         Q0(4) = -0.556;
+%     end
+% end
 Q = Q0;
 ErrInt = zeros(3,1);
-nCb = [1-2*(Q(3)^2+Q(4)^2),   2*(Q(2)*Q(3)-Q(1)*Q(4)),    2*(Q(2)*Q(4)+Q(1)*Q(3));
+bCn = [1-2*(Q(3)^2+Q(4)^2),   2*(Q(2)*Q(3)-Q(1)*Q(4)),    2*(Q(2)*Q(4)+Q(1)*Q(3));
        2*(Q(2)*Q(3)+Q(1)*Q(4)),   1-2*(Q(2)^2+Q(4)^2),    2*(Q(3)*Q(4)-Q(1)*Q(2));
        2*(Q(2)*Q(4)-Q(1)*Q(3)),   2*(Q(3)*Q(4)+Q(1)*Q(2)),    1-2*(Q(2)^2+Q(3)^2)];
-bCn = nCb';
+nCb = bCn';
 for k = 2:N
     rawGyro(:,k) = rawGyro(:,k) - gyroOffset;
     rawGyro(:,k) = rawGyro(:,k) * 1000 / 32768 * pi / 180;
     Eular(:,k) = AHRSupdate(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
     Eular(:,k) = Eular(:,k) * 180 / pi;
 end
-%figure(1);
-%plot(Eular([1,2,3],:)');
+figure(1);
+plot(Eular([1,2,3],:)');
 Q = Q0;
 ErrInt = zeros(3,1);
 for k = 2:N
@@ -114,9 +115,11 @@ figure(2)
 plot(CEular([1,2,3],:)');
 raw = raw';
 for k=1:N
-    angle(1,k) = -atan(raw(1,k) / raw(3,k));
+    angle(1,k) = atan(raw(1,k) / raw(3,k));
     angle(2,k) = atan(raw(2,k) / raw(3,k));
-    angle(3,k) = atan(raw(2,k) / raw(1,k));
+    angle(3,k) = acos(raw(7,k) / sqrt(raw(7,k)^2 + raw(8,k)^2 + raw(9,k)^2));
+    %angle(3,k) = acos(raw(1,k) / sqrt(raw(1,k)^2 + raw(2,k)^2 + raw(3,k)^2));
+    %angle(3,k) = atan(raw(8,k) / raw(9,k));
     angle(:,k) = angle(:,k) * 180 / pi;
 end
 figure(3);

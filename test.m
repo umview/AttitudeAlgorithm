@@ -1,5 +1,10 @@
 %------------test----------------------%
 t = load('raw.txt');
-accel = t(:,[1,2,3])';
-gyro = t(:,[4,5,6])';
-mag = t(:,[7,8,9])';
+Accel = t(:,[1,2,3])';
+Gyro = t(:,[4,5,6])';
+Mag = t(:,[7,8,9])';
+Q = QuaternionInit(Accel(:,1), Mag(:,1));
+bCn = getbCn(Q);
+
+Q
+bCn

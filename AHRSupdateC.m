@@ -1,9 +1,11 @@
-function Eular = AHRSupdateC(Accel,Gyro,Mag)
+function ypr = AHRSupdateC(Accel,Gyro,Mag)
     global T;
     global Q;
     global Kp;
     global Ki;
     global ErrInt;
+    global nCb;
+    global bCn;
     Accel = Accel / sqrt(sum(Accel.^2));
     Mag = Mag / sqrt(sum(Mag.^2));
     mx = Mag(1);
@@ -75,9 +77,14 @@ function Eular = AHRSupdateC(Accel,Gyro,Mag)
     Q(2) = q1(1);
     Q(3) = q2(1);
     Q(4) = q3(1);
-    %Q = Q / sqrt(sum(Q.^2));
-    Eular(1) = atan((2.0 * (q0q1 + q2q3)) / (q0q0 - q1q1 - q2q2 + q3q3));
-    Eular(2) = -asin(2.0 * (q1q3 - q0q2));
-    Eular(3) = atan((2.0 * (q1q2 + q0q3)) / (q0q0 + q1q1 - q2q2 - q3q3));
+    bCn = getbCn(Q);
+    nCb = bCn';
+    ypr = bCn2eular(bCn);
+%     %Roll
+%     Eular(1) = atan((2.0 * (q0q1 + q2q3)) / (q0q0 - q1q1 - q2q2 + q3q3));
+%     %Pitch
+%     Eular(2) = -asin(2.0 * (q1q3 - q0q2));
+%     %Yaw
+%     Eular(3) = atan((2.0 * (q1q2 + q0q3)) / (q0q0 + q1q1 - q2q2 - q3q3));
 end
 
