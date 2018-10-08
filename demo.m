@@ -18,7 +18,7 @@ T = 0.005;
 %Q = zeros(4,1);
 Q0 = zeros(4,1);
 %nCb = zeros(3,3);
-Kp = 2.0;
+Kp = 20.0;
 Ki = 0.2;
 %Eular = zeros(3,1);
 %bCn = nCb';
@@ -88,6 +88,7 @@ if rawMag(1,1) > 0 && rawMag(2,1) < 0
     end
 end
 Q = Q0;
+ErrInt = zeros(3,1);
 nCb = [1-2*(Q(3)^2+Q(4)^2),   2*(Q(2)*Q(3)-Q(1)*Q(4)),    2*(Q(2)*Q(4)+Q(1)*Q(3));
        2*(Q(2)*Q(3)+Q(1)*Q(4)),   1-2*(Q(2)^2+Q(4)^2),    2*(Q(3)*Q(4)-Q(1)*Q(2));
        2*(Q(2)*Q(4)-Q(1)*Q(3)),   2*(Q(3)*Q(4)+Q(1)*Q(2)),    1-2*(Q(2)^2+Q(3)^2)];
@@ -98,8 +99,8 @@ for k = 2:N
     Eular(:,k) = AHRSupdate(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
     Eular(:,k) = Eular(:,k) * 180 / pi;
 end
-figure(1);
-plot(Eular([1,2,3],:)');
+%figure(1);
+%plot(Eular([1,2,3],:)');
 Q = Q0;
 ErrInt = zeros(3,1);
 for k = 2:N
@@ -113,11 +114,13 @@ figure(2)
 plot(CEular([1,2,3],:)');
 raw = raw';
 for k=1:N
-    angle(2,k) = acos(raw(1,k) / sqrt(raw(1,k)^2 + raw(3,k)^2));
-    angle(1,k) = acos(raw(2,k) / sqrt(raw(2,k)^2 + raw(3,k)^2));
-    angle(3,k) = acos(raw(1,k) / sqrt(raw(1,k)^2 + raw(2,k)^2));
+    angle(1,k) = -atan(raw(1,k) / raw(3,k));
+    angle(2,k) = atan(raw(2,k) / raw(3,k));
+    angle(3,k) = atan(raw(2,k) / raw(1,k));
     angle(:,k) = angle(:,k) * 180 / pi;
 end
 figure(3);
 plot(angle');
+hold on;
+plot(CEular');
 
