@@ -1,4 +1,4 @@
-clear;
+clear all;
 clc;
 global T;
 global Q;
@@ -24,7 +24,7 @@ Ki = 0.2;
 %bCn = nCb';
 gyroOffset = zeros(3,1);
 raw = load('raw.txt');
-getOffset(raw(1:700,[4, 5, 6]));
+getOffset = getOffset(raw(1:700,[4, 5, 6]));
 raw = load('raw.txt');
 N = length(raw);
 angle = zeros(3,N);
@@ -40,74 +40,22 @@ for k = 1:N
 end
 
 Q0 = QuaternionInit(rawAccel(:,1), rawMag(:,1));
-% if rawMag(1,1) < 0 && rawMag(2,1) < 0
-%     if abs(rawMag(1,1) / rawMag(2,1)) >= 1
-%         Q0(1) = 0.195;
-%         Q0(2) = -0.015;
-%         Q0(3) = 0.0043;
-%         Q0(4) = 0.979;
-%     else
-%         Q0(1) = 0.555;
-%         Q0(2) = -0.015;
-%         Q0(3) = 0.006;
-%         Q0(4) = 0.829;
-%     end
-% end
-% if rawMag(1,1) < 0  && rawMag(2,1) > 0
-%     if abs(rawMag(1,1) / rawMag(2,1)) >= 1
-%         Q0(1) = -0.193;
-%         Q0(2) = -0.009;
-%         Q0(3) = -0.006;
-%         Q0(4) = 0.979;
-%     else
-%         Q0(1) = -0.552;
-%         Q0(2) = -0.0048;
-%         Q0(3) = -0.0115;
-%         Q0(4) = 0.8313;
-%     end
-% end
-% if rawMag(1,1) > 0 && rawMag(2,1) > 0
-%     if abs(rawMag(1,1) / rawMag(2,1)) >= 1
-%         Q0(1) = -0.9785;
-%         Q0(2) = 0.008;
-%         Q0(3) = -0.02;
-%         Q0(4) = 0.195;
-%     else
-%         Q0(1) = -0.9828;
-%         Q0(2) = 0.002;
-%         Q0(3) = -0.0167;
-%         Q0(4) = 0.5557;
-%     end
-% end
-% if rawMag(1,1) > 0 && rawMag(2,1) < 0
-%     if abs(rawMag(1,1) / rawMag(2,1)) >= 1
-%         Q0(1) = -0.979;
-%         Q0(2) = 0.0116;
-%         Q0(3) = -0.0167;
-%         Q0(4) = -0.195;
-%     else
-%         Q0(1) = -0.83;
-%         Q0(2) = 0.014;
-%         Q0(3) = -0.012;
-%         Q0(4) = -0.556;
-%     end
-% end
 Q = Q0;
 ErrInt = zeros(3,1);
 bCn = getbCn(Q);
 nCb = bCn';
 Eular(:,1) = bCn2eular(bCn);
 Eular(:,1) = rad2deg(Eular(:,1));
-for k = 2:N
-    %Eular(:,k) = AHRSupdate(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
-    Eular(:,k) = attitudeUpdate(rawGyro(:,k));
-    Eular(:,k) = rad2deg(Eular(:,k));
-end
-figure(1);
-plot(Eular([1,2,3],:)');
+% for k = 2:N
+%     %Eular(:,k) = AHRSupdate(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
+%     Eular(:,k) = attitudeUpdate(rawGyro(:,k));
+%     Eular(:,k) = rad2deg(Eular(:,k));
+% end
+% figure(1);
+% plot(Eular([1,2,3],:)');
 Q = Q0;
 ErrInt = zeros(3,1);
-CEular(:,1) = bCn2eular(bCn);
+CEular(:,1) = Eular(:,1);
 for k = 2:N
     CEular(:,k) = AHRSupdateC(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
     CEular(:,k) = rad2deg(CEular(:,k));
@@ -122,9 +70,11 @@ for k=1:N
     %angle(3,k) = acos(raw(1,k) / sqrt(raw(1,k)^2 + raw(2,k)^2 + raw(3,k)^2));
     %angle(3,k) = atan(raw(8,k) / raw(9,k));
     angle(:,k) = rad2deg(angle(:,k));
+
 end
 figure(3);
 plot(angle');
-hold on;
-plot(CEular');
+% hold on;
+% plot(Eular');
+% %plot(CEular');
 

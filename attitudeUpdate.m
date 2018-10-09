@@ -8,7 +8,8 @@ function ypr = attitudeUpdate(Gyro)
               delta(1),    0,  delta(3),  -delta(2);
               delta(2),    -delta(3), 0,  delta(1);
               delta(3),    delta(2),  -delta(1), 0];
-    Q = exp(0.5 * deltaX) * Q;
+    %Q = exp(0.5 * deltaX) * Q;
+    Q = (eye(4) + deltaX ./ 2 + ((deltaX ./ 2)^2) ./ 2 + ((deltaX ./ 2)^3) ./ 6) * Q;
     Q = Q / sqrt(sum(Q.^2));
     bCn = getbCn(Q);
     nCb = bCn';

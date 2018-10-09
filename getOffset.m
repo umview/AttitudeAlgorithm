@@ -1,4 +1,3 @@
-function getOffset(Gyro)
-    global gyroOffset;
+function gyroOffset = getOffset(Gyro)
     gyroOffset = mean(Gyro)';
 end
