@@ -33,8 +33,12 @@ CEular = zeros(3,N);
 rawAccel = raw(:,[1, 2, 3])';
 rawGyro = raw(:,[4, 5, 6])';
 rawMag = raw(:,[7, 8, 9])';
-rawGyro(:,1) = rawGyro(:,1) - gyroOffset;
-rawGyro(:,1) = rawGyro(:,1) * 1000 / 32768 * pi / 180;
+for k = 1:N
+    rawGyro(:,k) = rawGyro(:,k) - gyroOffset;
+    rawGyro(:,k) = rawGyro(:,k) * 1000 / 32768;
+    rawGyro(:,k) = deg2rad(rawGyro(:,k));
+end
+
 Q0 = QuaternionInit(rawAccel(:,1), rawMag(:,1));
 % if rawMag(1,1) < 0 && rawMag(2,1) < 0
 %     if abs(rawMag(1,1) / rawMag(2,1)) >= 1
@@ -90,26 +94,23 @@ Q0 = QuaternionInit(rawAccel(:,1), rawMag(:,1));
 % end
 Q = Q0;
 ErrInt = zeros(3,1);
-bCn = [1-2*(Q(3)^2+Q(4)^2),   2*(Q(2)*Q(3)-Q(1)*Q(4)),    2*(Q(2)*Q(4)+Q(1)*Q(3));
-       2*(Q(2)*Q(3)+Q(1)*Q(4)),   1-2*(Q(2)^2+Q(4)^2),    2*(Q(3)*Q(4)-Q(1)*Q(2));
-       2*(Q(2)*Q(4)-Q(1)*Q(3)),   2*(Q(3)*Q(4)+Q(1)*Q(2)),    1-2*(Q(2)^2+Q(3)^2)];
+bCn = getbCn(Q);
 nCb = bCn';
+Eular(:,1) = bCn2eular(bCn);
+Eular(:,1) = rad2deg(Eular(:,1));
 for k = 2:N
-    rawGyro(:,k) = rawGyro(:,k) - gyroOffset;
-    rawGyro(:,k) = rawGyro(:,k) * 1000 / 32768 * pi / 180;
-    Eular(:,k) = AHRSupdate(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
-    Eular(:,k) = Eular(:,k) * 180 / pi;
+    %Eular(:,k) = AHRSupdate(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
+    Eular(:,k) = attitudeUpdate(rawGyro(:,k));
+    Eular(:,k) = rad2deg(Eular(:,k));
 end
 figure(1);
 plot(Eular([1,2,3],:)');
 Q = Q0;
 ErrInt = zeros(3,1);
+CEular(:,1) = bCn2eular(bCn);
 for k = 2:N
-    rawGyro(:,k) = rawGyro(:,k) - gyroOffset;
-    rawGyro(:,k) = rawGyro(:,k) * 1000 / 32768 * pi / 180;
     CEular(:,k) = AHRSupdateC(rawAccel(:,k), rawGyro(:,k), rawMag(:,k));
-    CEular(:,k) = CEular(:,k) * 180 / pi;
-
+    CEular(:,k) = rad2deg(CEular(:,k));
 end
 figure(2)
 plot(CEular([1,2,3],:)');
@@ -120,7 +121,7 @@ for k=1:N
     angle(3,k) = acos(raw(7,k) / sqrt(raw(7,k)^2 + raw(8,k)^2 + raw(9,k)^2));
     %angle(3,k) = acos(raw(1,k) / sqrt(raw(1,k)^2 + raw(2,k)^2 + raw(3,k)^2));
     %angle(3,k) = atan(raw(8,k) / raw(9,k));
-    angle(:,k) = angle(:,k) * 180 / pi;
+    angle(:,k) = rad2deg(angle(:,k));
 end
 figure(3);
 plot(angle');

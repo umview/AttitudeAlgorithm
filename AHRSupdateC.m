@@ -49,15 +49,15 @@ function ypr = AHRSupdateC(Accel,Gyro,Mag)
     ey = (az*vx - ax*vz) + (mz*wx - mx*wz);
     ez = (ax*vy - ay*vx) + (mx*wy - my*wx);
 
-    if ex ~= 0.0 && ey ~= 0.0 && ez ~= 0.0
-    
-        ErrInt = ErrInt + ex * Ki * halfT;
-        ErrInt = ErrInt + ey * Ki * halfT;	
-        ErrInt = ErrInt + ez * Ki * halfT;
-        gx = gx + Kp*ex + ErrInt;
-        gy = gy + Kp*ey + ErrInt;
-        gz = gz + Kp*ez + ErrInt;
-    end
+%     if ex ~= 0.0 && ey ~= 0.0 && ez ~= 0.0
+%     
+%         ErrInt = ErrInt + ex * Ki * halfT;
+%         ErrInt = ErrInt + ey * Ki * halfT;	
+%         ErrInt = ErrInt + ez * Ki * halfT;
+%         gx = gx + Kp*ex + ErrInt;
+%         gy = gy + Kp*ey + ErrInt;
+%         gz = gz + Kp*ez + ErrInt;
+%     end
     tempq0 = q0 + (-q1*gx - q2*gy - q3*gz)*halfT;
     tempq1 = q1 + (q0*gx + q2*gz - q3*gy)*halfT;
     tempq2 = q2 + (q0*gy - q1*gz + q3*gx)*halfT;
